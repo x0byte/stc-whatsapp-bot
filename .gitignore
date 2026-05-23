@@ -1,0 +1,15 @@
+.env
+.env.*
+node_modules/
+auth_*/
+.node-persist/
+_IGNORE_*/
+*.data.json
+open-wa-*.postman_collection.json
+open-wa-*.sw_col.json
+
+# managed
+**.data.json
+**.node-persist**
+**_IGNORE_**
+# end managed
