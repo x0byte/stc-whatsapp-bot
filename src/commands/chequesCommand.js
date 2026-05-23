@@ -1,33 +1,75 @@
 const { formatDate } = require("../utils/dateFormatter");
 const { formatMoney } = require("../utils/moneyFormatter");
 
-function formatChequeItems(cheques) {
+function getDealerName(cheque) {
+    return cheque.dealerName || cheque.customerName || "නම සඳහන් නොවේ";
+}
+
+function getChequeNumber(cheque) {
+    return cheque.chequeNumber || "අංකය සඳහන් නොවේ";
+}
+
+function formatTodayChequeItems(cheques) {
     if (!Array.isArray(cheques) || cheques.length === 0) {
-        return ["None"];
+        return ["අද මුදල් කළ යුතු dealer cheque නොමැත."];
     }
 
-    return cheques.map((cheque, index) => {
-        const dealerName = cheque.dealerName || cheque.customerName || "Unknown dealer";
-        const chequeNumber = cheque.chequeNumber ? ` #${cheque.chequeNumber}` : "";
-        return `${index + 1}. ${dealerName}${chequeNumber} - ${formatMoney(cheque.amount)} - ${formatDate(cheque.dueDate)}`;
+    return cheques.slice(0, 5).map((cheque, index) => {
+        return `${index + 1}. ${getDealerName(cheque)} - ${formatMoney(cheque.amount)} - ${getChequeNumber(cheque)}`;
     });
 }
 
-function formatTodayCheques(response) {
-    return [
-        `Dealer cheques due today - ${formatDate(response.date)}`,
-        `Count: ${response.chequeCount || 0}`,
-        `Total: ${formatMoney(response.totalChequeAmount)}`,
-        ...formatChequeItems(response.cheques)
-    ].join("\n");
+function formatWeekChequeItems(cheques) {
+    if (!Array.isArray(cheques) || cheques.length === 0) {
+        return ["ඉදිරි දින 7 තුළ මුදල් කළ යුතු dealer cheque නොමැත."];
+    }
+
+    return cheques.slice(0, 5).map((cheque, index) => {
+        return `${index + 1}. ${getDealerName(cheque)} - ${formatMoney(cheque.amount)} - ${formatDate(cheque.dueDate)} - ${getChequeNumber(cheque)}`;
+    });
 }
 
-function formatWeekCheques(response) {
+function formatTodayCheques(response, includeHeading = true) {
+    const lines = [];
+    if (includeHeading) {
+        lines.push(`අද මුදල් කළ යුතු dealer cheque - ${formatDate(response.date)}`, "");
+    }
+
+    lines.push(
+        `ගණන: ${response.chequeCount || 0}`,
+        `මුළු මුදල: ${formatMoney(response.totalChequeAmount)}`,
+        "",
+        ...formatTodayChequeItems(response.cheques)
+    );
+
+    return lines.join("\n");
+}
+
+function formatWeekCheques(response, includeHeading = true) {
+    const lines = [];
+    if (includeHeading) {
+        lines.push("ඉදිරි දින 7 තුළ මුදල් කළ යුතු dealer cheque", "");
+    }
+
+    lines.push(
+        `ගණන: ${response.chequeCount || 0}`,
+        `මුළු මුදල: ${formatMoney(response.totalChequeAmount)}`,
+        "",
+        ...formatWeekChequeItems(response.cheques)
+    );
+
+    return lines.join("\n");
+}
+
+function formatCombinedCheques(todayResponse, weekResponse) {
     return [
-        `Dealer cheques due ${formatDate(response.startDate)} to ${formatDate(response.endDate)}`,
-        `Count: ${response.chequeCount || 0}`,
-        `Total: ${formatMoney(response.totalChequeAmount)}`,
-        ...formatChequeItems(response.cheques)
+        "Dealer Cheque සාරාංශය",
+        "",
+        "අද මුදල් කළ යුතු cheque:",
+        formatTodayCheques(todayResponse, false),
+        "",
+        "ඉදිරි දින 7 තුළ මුදල් කළ යුතු cheque:",
+        formatWeekCheques(weekResponse, false)
     ].join("\n");
 }
 
@@ -35,11 +77,7 @@ async function executeChequesCommand(apiClient) {
     const todayResponse = await apiClient.getChequesToday();
     const weekResponse = await apiClient.getChequesNextSevenDays();
 
-    return [
-        formatTodayCheques(todayResponse),
-        "",
-        formatWeekCheques(weekResponse)
-    ].join("\n");
+    return formatCombinedCheques(todayResponse, weekResponse);
 }
 
 async function executeChequesTodayCommand(apiClient) {

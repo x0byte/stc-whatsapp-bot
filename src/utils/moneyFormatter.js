@@ -6,10 +6,10 @@ const currencyFormatter = new Intl.NumberFormat("en-LK", {
 function formatMoney(value) {
     const numericValue = Number(value);
     if (!Number.isFinite(numericValue)) {
-        return "Rs. 0.00";
+        return "රු. 0.00";
     }
 
-    return `Rs. ${currencyFormatter.format(numericValue)}`;
+    return `රු. ${currencyFormatter.format(numericValue)}`;
 }
 
 module.exports = {

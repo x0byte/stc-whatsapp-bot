@@ -8,23 +8,27 @@ async function executeDebtCommand(apiClient) {
         : [];
 
     const lines = [
-        `Outstanding debt - ${formatDate(debt.asOfDate)}`,
-        `Total due: ${formatMoney(debt.totalOutstandingAmount)}`,
-        `Customers owing: ${debt.outstandingCustomerCount || 0}`,
-        `Outstanding bills: ${debt.outstandingBillCount || 0}`,
-        `Largest customer balance: ${formatMoney(debt.largestOutstandingAmount)}`,
-        `Oldest bill: ${formatDate(debt.oldestOutstandingBillDate)}`,
-        "",
-        "Top customers:"
+        `දැනට ගෙවීමට ඉතිරිව ඇති ණය තත්ත්වය - ${formatDate(debt.asOfDate)}`,
+        ""
     ];
 
     if (customers.length === 0) {
-        lines.push("None");
-    } else {
-        customers.forEach((customer, index) => {
-            lines.push(`${index + 1}. ${customer.customerName}: ${formatMoney(customer.outstandingAmount)}`);
-        });
+        lines.push("දැනට ගෙවීමට ඉතිරි ණය මුදල් නොමැත.");
+        return lines.join("\n");
     }
+
+    lines.push(
+        `ගෙවීමට ඉතිරි බිල්පත් ගණන: ${debt.outstandingBillCount || 0}`,
+        `ණය ඇති පාරිභෝගිකයන් ගණන: ${debt.outstandingCustomerCount || 0}`,
+        `මුළු හිඟ මුදල: ${formatMoney(debt.totalOutstandingAmount)}`,
+        `එක් පාරිභෝගිකයෙකුට ඇති වැඩිම හිඟ මුදල: ${formatMoney(debt.largestOutstandingAmount)}`,
+        "",
+        "වැඩිම හිඟ මුදල් ඇති පාරිභෝගිකයන්:"
+    );
+
+    customers.forEach((customer, index) => {
+        lines.push(`${index + 1}. ${customer.customerName} - ${formatMoney(customer.outstandingAmount)}`);
+    });
 
     return lines.join("\n");
 }

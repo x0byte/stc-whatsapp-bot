@@ -5,12 +5,15 @@ async function executeSalesSummaryCommand(apiClient) {
     const summary = await apiClient.getSalesSummaryToday();
 
     return [
-        `Today's cash summary - ${formatDate(summary.date)}`,
-        `Cash sales: ${formatMoney(summary.cashSales)}`,
-        `Credit sales: ${formatMoney(summary.creditSales)}`,
-        `Non-cash sales: ${formatMoney(summary.nonCashSales)}`,
-        `Credit received: ${formatMoney(summary.creditReceived)}`,
-        `Cash in shop: ${formatMoney(summary.cashInShop)}`
+        `STC අද දින මුදල් සාරාංශය - ${formatDate(summary.date)}`,
+        "",
+        "",
+        `Cash විකුණුම්: ${formatMoney(summary.cashSales)}`,
+        `ණයට කළ විකුණුම්: ${formatMoney(summary.creditSales)}`,
+        `Cash නොවන විකුණුම්: ${formatMoney(summary.nonCashSales)}`,
+        `ණය මුදල් ලැබීම්: ${formatMoney(summary.creditReceived)}`,
+        "",
+        `අද දින කඩයේ තැබිය යුතු Cash: ${formatMoney(summary.cashInShop)}`
     ].join("\n");
 }
 

@@ -44,20 +44,20 @@ async function buildReply(command, apiClient) {
         case "help":
             return executeHelpCommand();
         default:
-            return "Unknown command. Send help.";
+            return "එම විධානය හඳුනාගැනීමට බැරි වුණා.\nභාවිත කළ හැකි විධාන බලන්න help ලෙස එවන්න.";
     }
 }
 
 function apiErrorReply(error) {
     if (error instanceof StcApiClientError && error.code === "authorization") {
-        return "Dashboard authorization failed. Check bot API key.";
+        return "Dashboard API අවසරය අසාර්ථකයි. Bot API key එක පරීක්ෂා කරන්න.";
     }
 
     if (error instanceof StcApiClientError && error.code === "unreachable") {
-        return "STC dashboard is not reachable right now.";
+        return "STC dashboard එකට දැන් සම්බන්ධ වීමට බැහැ. කරුණාකර පසුව නැවත උත්සාහ කරන්න.";
     }
 
-    return "STC dashboard request failed. Please try again later.";
+    return "STC dashboard ඉල්ලීම අසාර්ථකයි. කරුණාකර පසුව නැවත උත්සාහ කරන්න.";
 }
 
 function buildAuthFolder(sessionId) {
